@@ -18,7 +18,7 @@ public class JwtUtil {
     private final long expirationMs;
     private final UserService userService;
 
-    // Constructor-based dependency injection
+
     public JwtUtil(
             UserService userService,
             @Value("${jwt.secret}") String secretKey,
