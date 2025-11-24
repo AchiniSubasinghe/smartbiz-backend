@@ -14,11 +14,13 @@ public class SignUpRequestDto {
     private String userName;
 
     @Size(min=8 ,message = "Password must have at least 8 characters")
+    @NotBlank(message = "Password cannot be Null")
     private String password;
 
-    private String Role;
+    @NotBlank(message = "Please select at least one role")
+    private String role;
 
     @NotBlank(message = "Please Enter your Full Name")
-    private String FullName;
+    private String fullName;
 
 }
