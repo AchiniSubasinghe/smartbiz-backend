@@ -17,7 +17,7 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
+//generate token
     private final JwtUtil jwtUtil;
     private final UserService userService;
 
@@ -64,6 +64,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.equals("/signing") || path.equals("/signup") || path.equals("/logout");
+        return path.equals("/signIn") || path.equals("/signUp") || path.equals("/logout");
     }
 }
