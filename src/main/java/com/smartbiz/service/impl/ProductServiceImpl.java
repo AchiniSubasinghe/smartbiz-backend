@@ -1,9 +1,12 @@
 package com.smartbiz.service.impl;
 
+import com.smartbiz.dto.request.ProductRequestDto;
+import com.smartbiz.dto.response.ProductResponseDto;
 import com.smartbiz.entity.Product;
 import com.smartbiz.repo.ProductRepo;
 import com.smartbiz.service.ProductService;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -19,25 +22,42 @@ public class ProductServiceImpl implements ProductService {
 
     // Create Product
     @Override
-    public Product addProduct(Product product) {
-        if (productRepo.existsBySku(product.getSku())) {
+    public ProductResponseDto addProduct(ProductRequestDto productRequestDto) {
+        if (productRepo.existsBySku(productRequestDto.getSku())) {
             throw new RuntimeException("SKU already exists");
         }
-        return productRepo.save(product);
+        Product product = Product.builder()
+                .sku(productRequestDto.getSku())
+                .name(productRequestDto.getName())
+                .unitPrice(productRequestDto.getUnitPrice())
+                .quantity(productRequestDto.getQuantity())
+                .build();
+
+        return ProductResponseDto.fromEntity(productRepo.save(product));
     }
 
     // Update Product
-    @Override
-    public Product updateProduct(UUID id, Product updatedDetails) {
+    Override
+    public ProductResponseDto updateProduct(UUID id, ProductRequestDto dto) {
+
         Product product = getProductById(id);
 
-        product.setSku(updatedDetails.getSku());
-        product.setName(updatedDetails.getName());
-        product.setUnitPrice(updatedDetails.getUnitPrice());
-        product.setQuantity(updatedDetails.getQuantity());
+        // Prevent duplicate SKU (except its own)
+        if (!product.getSku().equals(dto.getSku()) &&
+                productRepo.existsBySku(dto.getSku())) {
+            throw new RuntimeException("SKU already exists");
+        }
 
-        return productRepo.save(product);
+        product.setSku(dto.getSku());
+        product.setName(dto.getName());
+        product.setUnitPrice(dto.getUnitPrice());
+        product.setQuantity(dto.getQuantity());
+
+        productRepo.save(product);
+
+        return ProductResponseDto.fromEntity(product);
     }
+
 
     // Delete Product
     @Override
