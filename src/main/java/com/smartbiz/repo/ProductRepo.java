@@ -11,5 +11,6 @@ public interface ProductRepo extends JpaRepository<Product , UUID> {
 
     Optional<Product> findBySku(String sku);
     List<Product> findBySkuStartingWithIgnoreCase(String sku);
+    List<Product> findByQuantityLessThan(double lowStock);
     boolean existsBySku(String sku);
 }

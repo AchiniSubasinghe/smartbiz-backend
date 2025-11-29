@@ -84,4 +84,13 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> getAllProducts() {
         return productRepo.findAll();
     }
+
+     //    Get low stock
+    @Override
+    public List<Product> getLowStockProducts() {
+        double lowStock =10;
+        return productRepo.findByQuantityLessThan(lowStock);
+    }
+
+
 }

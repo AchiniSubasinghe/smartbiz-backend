@@ -19,13 +19,13 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // ✅ Create Product
+    //  Create Product
     @PostMapping
     public ResponseEntity<ProductResponseDto> addProduct(@RequestBody ProductRequestDto dto) {
         return ResponseEntity.ok(productService.addProduct(dto));
     }
 
-    // ✅ Update Product
+    // Update Product
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponseDto> updateProduct(
             @PathVariable UUID id,
@@ -35,28 +35,28 @@ public class ProductController {
     }
 
 
-    // ✅ Delete Product
+    // Delete Product
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable UUID id) {
         productService.deleteProduct(id);
         return ResponseEntity.ok("Product deleted successfully");
     }
 
-    // ✅ Get Product by ID
+    // Get Product by ID
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getProductById(@PathVariable UUID id) {
         Product product = productService.getProductById(id);
         return ResponseEntity.ok(ProductResponseDto.fromEntity(product));
     }
 
-    // ✅ Get Product by SKU
+    // Get Product by SKU
     @GetMapping("/sku/{sku}")
     public ResponseEntity<ProductResponseDto> getProductBySku(@PathVariable String sku) {
         Product product = productService.getProductBySku(sku);
         return ResponseEntity.ok(ProductResponseDto.fromEntity(product));
     }
 
-    // ✅ Get all products
+    // Get all products
     @GetMapping
     public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
@@ -67,4 +67,16 @@ public class ProductController {
 
         return ResponseEntity.ok(dtos);
     }
+
+   // get low stock
+   @GetMapping("/low-stock")
+   public ResponseEntity<List<ProductResponseDto>> getLowStock() {
+       List<Product> lowStockProducts = productService.getLowStockProducts();
+
+       List<ProductResponseDto> dtos = lowStockProducts.stream()
+               .map(ProductResponseDto::fromEntity)
+               .toList();
+       return ResponseEntity.ok(dtos);
+   }
+
 }

@@ -14,6 +14,8 @@ public interface ProductService {
     Product getProductById(UUID id);
     Product getProductBySku(String sku);
     List<Product> getAllProducts();
+    List<Product>getLowStockProducts();
+
 }
 
 
