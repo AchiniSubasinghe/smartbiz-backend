@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService{
    public UserResponseDto addUser (SignUpRequestDto signUpRequestDto){
        String encodePassword = passwordEncoder.encode(signUpRequestDto.getPassword());
        User user =User.builder()
-               .username(signUpRequestDto.getUserName())
+               .username(signUpRequestDto.getUsername())
                .fullName(signUpRequestDto.getFullName())
                .role(Role.valueOf(signUpRequestDto.getRole().toUpperCase()))
                .password(encodePassword)

@@ -10,8 +10,8 @@ import lombok.*;
 
 public class SignUpRequestDto {
     @Size(min=6 ,message = "Username must have at least 6 characters")
-    @NotBlank(message = "UserName cannot be Null")
-    private String userName;
+    @NotBlank(message = "Username cannot be Null")
+    private String username;
 
     @Size(min=8 ,message = "Password must have at least 8 characters")
     @NotBlank(message = "Password cannot be Null")
