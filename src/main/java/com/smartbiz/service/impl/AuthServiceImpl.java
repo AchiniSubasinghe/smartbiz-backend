@@ -46,7 +46,8 @@ public class AuthServiceImpl implements AuthService{
        User user =User.builder()
                .username(signUpRequestDto.getUsername())
                .fullName(signUpRequestDto.getFullName())
-               .role(Role.valueOf(signUpRequestDto.getRole().toUpperCase()))
+               //.role(Role.valueOf(signUpRequestDto.getRole().toUpperCase()))
+               .role(Role.EDITOR)
                .password(encodePassword)
                .build();
 
@@ -55,27 +56,47 @@ public class AuthServiceImpl implements AuthService{
    }
 
    //login
-    public SignInResultDto signIn (SignInRequestDto signInRequestDto){
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequestDto.getUsername(),signInRequestDto.getPassword()));
-        UserDetails userDetails = userService.loadUserByUsername(signInRequestDto.getUsername());
-        UserResponseDto user =userService.getUserByUsername(signInRequestDto.getUsername());
-        String token=jwtUtil.generateToken(userDetails);
+   @Override
+   public SignInResultDto signIn(SignInRequestDto signInRequestDto) {
+       // authenticate credentials
+       authenticationManager.authenticate(
+               new UsernamePasswordAuthenticationToken(
+                       signInRequestDto.getUsername(),
+                       signInRequestDto.getPassword()
+               )
+       );
+       //load user full details
+       UserDetails userDetails = userService.loadUserByUsername(signInRequestDto.getUsername());
+      //load user response dto
+       UserResponseDto user = userService.getUserByUsername(signInRequestDto.getUsername());
+       // generate token
+       String token = jwtUtil.generateToken(userDetails);
+       // create http-only cookie
+       ResponseCookie cookie = ResponseCookie.from("jwt", token)
+               .httpOnly(true)
+               .secure(false)  // change to true when using HTTPS
+               .path("/")
+               .maxAge(24 * 60 * 60)
+               .sameSite("Lax")
+               .build();
+       return SignInResultDto.builder()
+               .cookie(cookie)        // this sets Set-Cookie header
+               .token(token)          // easy access for frontend
+               .userResponseDto(user) // user info
+               .build();
+   }
 
-        ResponseCookie cookie =ResponseCookie.from("jwt",token).httpOnly(true).secure(false).
-                path("/").maxAge(24*60*60).sameSite("Lax").build();
-        return SignInResultDto.builder().cookie(cookie).userResponseDto(user).build();
-    }
 
-   //changePassword
-   public UserResponseDto changePassword(String username, String oldPassword, String newPassword) {
+    //changePassword
+   public UserResponseDto changePassword(String username, String newPassword) {
        // Find the user by username
        User user = userRepo.findByUsername(username)
                .orElseThrow(() -> new RuntimeException("User not found"));
 
        // Check old password
-       if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-           throw new RuntimeException("Old password is incorrect");
-       }
+//       if (!passwordEncoder.matches(newPassword, user.getPassword())) {
+//           throw new RuntimeException("Old password is incorrect");
+//       }
 
        // Encode new password and save
        user.setPassword(passwordEncoder.encode(newPassword));
