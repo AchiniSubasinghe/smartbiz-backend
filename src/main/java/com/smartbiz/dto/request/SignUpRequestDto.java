@@ -1,5 +1,6 @@
 package com.smartbiz.dto.request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -17,8 +18,11 @@ public class SignUpRequestDto {
     @NotBlank(message = "Password cannot be Null")
     private String password;
 
-    @NotBlank(message = "Please select at least one role")
-    private String role;
+    @NotBlank(message = "Email cannot be Null")
+    private String email;
+
+//    @NotBlank(message = "Please select at least one role")
+//    private String role;
 
     @NotBlank(message = "Please Enter your Full Name")
     private String fullName;

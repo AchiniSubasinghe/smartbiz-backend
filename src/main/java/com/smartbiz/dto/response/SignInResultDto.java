@@ -10,5 +10,6 @@ import org.springframework.http.ResponseCookie;
 @Builder
 public class SignInResultDto {
     private ResponseCookie cookie;
+    private String token;
     private UserResponseDto userResponseDto;
 }
