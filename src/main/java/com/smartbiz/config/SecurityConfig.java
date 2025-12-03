@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/signIn", "/signUp", "/logout").permitAll()
+                        .requestMatchers("/signIn", "/signUp", "/logout","/send-reset-email","/reset-password-confirm").permitAll()
                         .requestMatchers("/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/products/**").hasRole("EDITOR")
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
@@ -48,7 +48,7 @@ public class SecurityConfig {
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:5173"); // Your frontend URL
+        config.addAllowedOrigin("http://localhost:3000"); // Your frontend URL
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 
