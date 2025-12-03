@@ -14,7 +14,5 @@ public interface UserRepo extends JpaRepository<User, UUID> {
     boolean existsByUsername (String username);
 
     Optional<User> findByFullName(String fullName);
-
-
-
+    Optional<User> findByEmail(String email);
 }
