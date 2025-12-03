@@ -1,5 +1,6 @@
 package com.smartbiz.controller;
 
+import com.smartbiz.dto.request.ChangePasswordDto;
 import com.smartbiz.dto.request.SignInRequestDto;
 import com.smartbiz.dto.request.SignUpRequestDto;
 import com.smartbiz.dto.response.ApiResponseDto;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 //allow sending cookies from back end to front end(putting bcz back end and frontend
 // running in different ports)
 @CrossOrigin(
-        origins = "http://localhost:5173",
+        origins = "http://localhost:3000",
         allowCredentials = "true"
 )
 
@@ -46,14 +47,39 @@ public class AuthController {
     }
 
 //LogIN
-    @PostMapping("/signIn")
-    public ResponseEntity<ApiResponseDto<SignInResultDto>>
-    signIn(@RequestBody @Valid SignInRequestDto dto) {
-        SignInResultDto response = authService.signIn(dto);
-        return ResponseEntity.ok(new ApiResponseDto<>(true, "Login successful", response));
+@PostMapping("/signIn")
+public ResponseEntity<ApiResponseDto<SignInResultDto>> signIn(@RequestBody @Valid SignInRequestDto dto) {
+    SignInResultDto response = authService.signIn(dto);
+    ApiResponseDto<SignInResultDto> body = new ApiResponseDto<>(true, "Login successful", response);
+    if (response.getCookie() != null) {
+        // include Set-Cookie header so browser receives httpOnly cookie
+        return ResponseEntity.ok()
+                .header("Set-Cookie", response.getCookie().toString())
+                .body(body);
+    } else {
+        return ResponseEntity.ok(body);
+    }
+}
+
+    //change password
+    @PostMapping("/change-password")
+    public ResponseEntity<ApiResponseDto<Object>> changePassword(@RequestBody @Valid ChangePasswordDto dto) {
+        // confirm password
+        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body(
+                    new ApiResponseDto<>(false, "Passwords do not match", null)
+            );
+        }
+
+        UserResponseDto updated = authService.changePassword(dto.getUsername(), dto.getNewPassword());
+        //ApiResponseDto<Object> response = new ApiResponseDto<>(true, "Password changed successfully", updated);
+        return ResponseEntity.ok(new ApiResponseDto<>(
+                true,"Password reset successfully",updated
+        ));
     }
 
-//Log Out
+
+    //Log Out
     @PostMapping("/logout")
     public ResponseEntity<ApiResponseDto<Object>> logout() {
         ResponseCookie cookie = ResponseCookie.from("jwt", "")
