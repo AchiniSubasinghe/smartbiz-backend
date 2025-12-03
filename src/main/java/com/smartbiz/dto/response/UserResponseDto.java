@@ -9,15 +9,16 @@ import java.util.UUID;
 @Getter
 public class UserResponseDto {
     private UUID id;
-    private String userName;
+    private String username;
     private String fullName;
     private Role role;
+
 
     public static UserResponseDto fromEntity(User user) {
         return UserResponseDto.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
-                .userName(user.getUsername())
+                .username(user.getUsername())
                 .role(user.getRole())
                 .build();
     }
