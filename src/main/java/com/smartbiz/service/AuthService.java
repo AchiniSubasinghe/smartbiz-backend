@@ -9,6 +9,8 @@ import com.smartbiz.dto.response.UserResponseDto;
 public interface AuthService {
     public UserResponseDto addUser(SignUpRequestDto signUpRequestDto);
     public SignInResultDto signIn (SignInRequestDto signInRequestDto);
+    public String sendResetEmail(String email);
+    void resetPasswordWithToken(String token,String newPassword);
 
 
 }

@@ -4,20 +4,27 @@ import com.smartbiz.dto.request.SignInRequestDto;
 import com.smartbiz.dto.response.SignInResultDto;
 import com.smartbiz.dto.request.SignUpRequestDto;
 import com.smartbiz.dto.response.UserResponseDto;
+import com.smartbiz.entity.ChangePasswordToken;
 import com.smartbiz.entity.User;
 import com.smartbiz.enums.Role;
+import com.smartbiz.repo.ChangePasswordTokenRepo;
 import com.smartbiz.repo.UserRepo;
 import com.smartbiz.service.AuthService;
+import com.smartbiz.service.EmailService;
 import com.smartbiz.service.UserService;
 import com.smartbiz.util.JwtUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService{
@@ -25,27 +32,30 @@ public class AuthServiceImpl implements AuthService{
    private final PasswordEncoder passwordEncoder;
    private final JwtUtil jwtUtil;
    private final AuthenticationManager authenticationManager;
-
+   private final ChangePasswordTokenRepo changePasswordTokenRepo;
+   private final EmailService emailService;
    private final UserService userService;
 
 
    //constructor
-    public AuthServiceImpl(UserRepo userRepo, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, AuthenticationManager authenticationManager, UserService userService) {
+    public AuthServiceImpl(UserRepo userRepo, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, AuthenticationManager authenticationManager, UserService userService,ChangePasswordTokenRepo changePasswordTokenRepo ,EmailService emailService) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil=jwtUtil;
         this.authenticationManager=authenticationManager;
-
+        this.emailService=emailService;
+        this.changePasswordTokenRepo= changePasswordTokenRepo;
         this.userService=userService;
 
     }
 
-    //addUser
+    //AddUser
    public UserResponseDto addUser (SignUpRequestDto signUpRequestDto){
        String encodePassword = passwordEncoder.encode(signUpRequestDto.getPassword());
        User user =User.builder()
                .username(signUpRequestDto.getUsername())
                .fullName(signUpRequestDto.getFullName())
+               .email(signUpRequestDto.getEmail())
                //.role(Role.valueOf(signUpRequestDto.getRole().toUpperCase()))
                .role(Role.EDITOR)
                .password(encodePassword)
@@ -86,25 +96,53 @@ public class AuthServiceImpl implements AuthService{
                .build();
    }
 
+//  Send reset Email
+@Override
+public String sendResetEmail(String email) {
+    User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("Email not found"));
 
-    //changePassword
-   public UserResponseDto changePassword(String username, String newPassword) {
-       // Find the user by username
-       User user = userRepo.findByUsername(username)
-               .orElseThrow(() -> new RuntimeException("User not found"));
+    String token = UUID.randomUUID().toString();
 
-       // Check old password
-//       if (!passwordEncoder.matches(newPassword, user.getPassword())) {
-//           throw new RuntimeException("Old password is incorrect");
-//       }
+      ChangePasswordToken resetToken = ChangePasswordToken.builder()
+            .token(token)
+            .email(email)
+            .expiresAt(LocalDateTime.now().plusMinutes(30))
+            .build();
 
-       // Encode new password and save
-       user.setPassword(passwordEncoder.encode(newPassword));
-       userRepo.save(user);
+    changePasswordTokenRepo.save(resetToken);
 
-       return UserResponseDto.fromEntity(user);
-   }
-   //auhentication
+    String link = "http://localhost:3000/auth/reset-password?token=" + token;
+    emailService.sendResetPasswordEmail(email,  link);
+
+    return link;
+}
+
+//reset password with token
+@Transactional
+@Override
+public void resetPasswordWithToken(String token, String newPassword) {
+
+
+    ChangePasswordToken resetToken = changePasswordTokenRepo.findByToken(token)
+            .orElseThrow(() -> new RuntimeException("Invalid reset token"));
+
+    if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+        throw new RuntimeException("Reset token expired");
+    }
+
+    User user = userRepo.findByEmail(resetToken.getEmail())
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+    user.setPassword(passwordEncoder.encode(newPassword));
+    userRepo.save(user);
+
+    changePasswordTokenRepo.deleteByToken(token);
+}
+
+
+
+    //auhentication
    public boolean authenticateUser(String token) {
        try {
            String username = jwtUtil.extractUsername(token);
