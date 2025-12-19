@@ -8,8 +8,8 @@ import lombok.Setter;
 @Setter
 public class SignInRequestDto {
 
-    @NotBlank(message = "Please enter your username")
-    private String username;
+    @NotBlank(message = "Please enter your email")
+    private String email;
 
     @NotBlank(message = "Please enter your password")
     private String password;
