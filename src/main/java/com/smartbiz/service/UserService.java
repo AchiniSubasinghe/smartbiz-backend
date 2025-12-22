@@ -19,17 +19,17 @@
         private UserRepo userRepo;
 
         @Override
-        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-            User user = userRepo.findByUsername(username).orElse(null);
+        public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+            User user = userRepo.findByEmail(email).orElse(null);
             if (user == null) {
                 throw new UsernameNotFoundException("user not found ");
             }
             return new org.springframework.security.core.userdetails.User(
-                    user.getUsername(), user.getPassword(), user.getAuthorities());
+                    user.getEmail(), user.getPassword(), user.getAuthorities());
         }
 
-        public UserResponseDto getUserByUsername (String username ){
-            User user =userRepo.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("user not found by username"));
+        public UserResponseDto getUserByEmail (String email ){
+            User user =userRepo.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("user not found by email"));
             return UserResponseDto.fromEntity(user);
         }
 
