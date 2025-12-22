@@ -29,33 +29,33 @@ public class JwtUtil {
         this.expirationMs = expirationMs;
     }
 
-    // ✅ Generate JWT Token
+    // Generate JWT Token (email is used as subject)
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
+                .setSubject(userDetails.getUsername()) //email
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // ✅ Extract Username from Token
+    // Extract Username from Token
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
 
-    // ✅ Validate Token
+    // Validate Token
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    // ✅ Check if Token is Expired
+    // Check if Token is Expired
     private boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());
     }
 
-    // ✅ Extract All Claims (Payload)
+    // Extract All Claims (Payload)
     private Claims extractAllClaims(String token) {
         try {
             return Jwts.parserBuilder()
