@@ -71,14 +71,14 @@ public class AuthServiceImpl implements AuthService{
        // authenticate credentials
        authenticationManager.authenticate(
                new UsernamePasswordAuthenticationToken(
-                       signInRequestDto.getUsername(),
+                       signInRequestDto.getEmail(),
                        signInRequestDto.getPassword()
                )
        );
        //load user full details
-       UserDetails userDetails = userService.loadUserByUsername(signInRequestDto.getUsername());
+       UserDetails userDetails = userService.loadUserByUsername(signInRequestDto.getEmail());
       //load user response dto
-       UserResponseDto user = userService.getUserByUsername(signInRequestDto.getUsername());
+       UserResponseDto user = userService.getUserByEmail(signInRequestDto.getEmail());
        // generate token
        String token = jwtUtil.generateToken(userDetails);
        // create http-only cookie
@@ -146,7 +146,7 @@ public void resetPasswordWithToken(String token, String newPassword) {
    public boolean authenticateUser(String token) {
        try {
            String username = jwtUtil.extractUsername(token);
-           Optional<User> userOptional = userRepo.findByUsername(username);
+           Optional<User> userOptional = userRepo.findByEmail(username);
            if (userOptional.isEmpty()) {
                return false;
            }
