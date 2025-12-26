@@ -1,5 +1,7 @@
 package com.smartbiz.service.impl;
 
+import com.smartbiz.dto.request.SubscriptionPlanRequestDto;
+import com.smartbiz.dto.response.SubscriptionPlanResponseDto;
 import com.smartbiz.entity.SubscriptionPlan;
 import com.smartbiz.repo.SubscriptionPlanRepo;
 import com.smartbiz.service.SubscriptionPlanService;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 
@@ -18,38 +21,60 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     }
 
     @Override
-    public SubscriptionPlan create(SubscriptionPlan plan) {
-        return repository.save(plan);
+    public SubscriptionPlanResponseDto create(SubscriptionPlanRequestDto dto) {
+        SubscriptionPlan plan = new SubscriptionPlan();
+        plan.setSubscriptionName(dto.getSubscriptionName());
+        plan.setSubscriptionPrice(dto.getSubscriptionPrice());
+
+        SubscriptionPlan saved = repository.save(plan);
+        return mapToResponse(saved);
+    }
+
+    private SubscriptionPlanResponseDto mapToResponse(SubscriptionPlan saved) {
+        return new SubscriptionPlanResponseDto(
+                saved.getId(),
+                saved.getSubscriptionName(),
+                saved.getSubscriptionPrice()
+        );
     }
 
     @Override
-    public List<SubscriptionPlan> getAll() {
-        return repository.findAll();
+    public List<SubscriptionPlanResponseDto> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public SubscriptionPlan getById(UUID id) {
-        return repository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Subscription Plan ID not found"));
+    public SubscriptionPlanResponseDto getById(UUID id) {
+        SubscriptionPlan plan = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Subscription Plan Id not found "));
+        return mapToResponse(plan);
     }
 
     @Override
-    public SubscriptionPlan getByName(String name) {
-        return repository.findBySubscriptionName(name)
-                .orElseThrow(() -> new RuntimeException("Subscription Plan Name not found"));
+    public SubscriptionPlanResponseDto getByName(String name) {
+        SubscriptionPlan plan = repository.findBySubscriptionName(name)
+                .orElseThrow(() -> new RuntimeException("Subscription Plan not found"));
+        return mapToResponse(plan);
     }
 
     @Override
-    public SubscriptionPlan update(UUID id, SubscriptionPlan plan) {
-        SubscriptionPlan existing = getById(id);
-        existing.setSubscriptionName(plan.getSubscriptionName());
-        existing.setSubscriptionPrice(plan.getSubscriptionPrice());
-        return repository.save(existing);
+    public SubscriptionPlanResponseDto update(UUID id, SubscriptionPlanRequestDto dto) {
+        SubscriptionPlan plan = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Subscription Plan Id not found"));
+
+        plan.setSubscriptionName(dto.getSubscriptionName());
+        plan.setSubscriptionPrice(dto.getSubscriptionPrice());
+
+        return mapToResponse(repository.save(plan));
     }
 
     @Override
     public void delete(UUID id) {
-        SubscriptionPlan plan = getById(id);
+        SubscriptionPlan plan = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Subscription Plan not found"));
         repository.delete(plan);
     }
 }
