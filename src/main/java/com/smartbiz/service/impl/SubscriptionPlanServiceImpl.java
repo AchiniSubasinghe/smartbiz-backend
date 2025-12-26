@@ -3,9 +3,12 @@ package com.smartbiz.service.impl;
 import com.smartbiz.entity.SubscriptionPlan;
 import com.smartbiz.repo.SubscriptionPlanRepo;
 import com.smartbiz.service.SubscriptionPlanService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+
+@Service
 
 public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     private final SubscriptionPlanRepo repository;
