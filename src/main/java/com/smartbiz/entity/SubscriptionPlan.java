@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,8 +19,8 @@ public class SubscriptionPlan {
     private UUID id;
     @Column(name = "subscription_name", nullable = false, length = 50)
     private String subscriptionName;
-    @Column(name = "subscription_price", nullable = false)
-    private double subscriptionPrice;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal subscriptionPrice;
     @OneToMany(mappedBy = "subscriptionPlan")
     private List<Owner> owners;
     @OneToMany(mappedBy = "subscriptionPlan")
