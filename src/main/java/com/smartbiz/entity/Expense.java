@@ -8,7 +8,11 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
-@Getter@Setter@NoArgsConstructor@AllArgsConstructor@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -22,4 +26,7 @@ public class Expense {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ExpenseType type;
+    @ManyToOne
+    @JoinColumn(name = "business_id", nullable = false)
+    private Business business;
 }

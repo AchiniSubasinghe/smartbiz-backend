@@ -21,8 +21,8 @@ public class SubscriptionPlan {
     private String subscriptionName;
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subscriptionPrice;
-    @OneToMany(mappedBy = "subscriptionPlan")
-    private List<Owner> owners;
-    @OneToMany(mappedBy = "subscriptionPlan")
-    private List<Business> businesses;
+    // @OneToMany(mappedBy = "subscriptionPlan")
+    // private List<Owner> owners;
+    // @OneToMany(mappedBy = "subscriptionPlan")
+    // private List<Business> businesses;
 }

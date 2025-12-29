@@ -27,17 +27,21 @@ public class Business {
     @ManyToOne
     @JoinColumn(name = "subscription_id", nullable = false)
     private SubscriptionPlan subscriptionPlan;
-    @OneToMany(mappedBy = "business")
-    private List<Customer> customers;
-    @OneToMany(mappedBy = "business")
-    private List<Income> incomes;
+    // TODO: Uncomment when Customer entity is created
+    // @OneToMany(mappedBy = "business")
+    // private List<Customer> customers;
+    // TODO: Uncomment when Income entity is created
+    // @OneToMany(mappedBy = "business")
+    // private List<Income> incomes;
     @OneToMany(mappedBy = "business")
     private List<Expense> expenses;
     @OneToMany(mappedBy = "business")
     private List<Product> products;
-    @OneToMany(mappedBy = "business")
-    private List<Supplier> suppliers;
-    @OneToMany(mappedBy = "business")
-    private List<Order> orders;
+    // TODO: Uncomment when Supplier entity is created
+    // @OneToMany(mappedBy = "business")
+    // private List<Supplier> suppliers;
+    // TODO: Uncomment when Order entity is created
+    // @OneToMany(mappedBy = "business")
+    // private List<Order> orders;
 
 }
