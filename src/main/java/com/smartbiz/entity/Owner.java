@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -28,7 +30,9 @@ public class Owner {
     @ManyToOne
     @JoinColumn(name = "subscription_plan_id", nullable = false)
     private SubscriptionPlan subscriptionPlan;
-    @OneToMany(mappedBy = "owner")
-    private List<Business> businesses;
+    @ManyToMany
+    @JoinTable(name="businees_owner")
+    public Set<Business> businesses = new HashSet<>();
+
 
 }
