@@ -7,8 +7,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
-@Getter @Setter
+@Getter
+@Setter
 public class ExpenseRequestDto {
     @NotBlank
     private String description;
@@ -22,4 +24,6 @@ public class ExpenseRequestDto {
     @NotNull
     private ExpenseType type;
 
+    @NotNull
+    private UUID businessId;
 }
