@@ -26,7 +26,7 @@ public class Business {
     @ManyToOne
     @JoinColumn(name = "subscription_id", nullable = false)
     private SubscriptionPlan subscriptionPlan;
-   @ManyToMany(mappedBy = "owners")
+    @ManyToMany(mappedBy = "businesses")
     public Set<Owner> owners = new HashSet<>();
 
 }
