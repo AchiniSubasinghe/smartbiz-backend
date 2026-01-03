@@ -7,7 +7,15 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ExpenseService {
-    ExpenseResponseDto create(ExpenseRequestDto requestDto);
+    ExpenseResponseDto create(ExpenseRequestDto dto);
+
     List<ExpenseResponseDto> getAll();
-    void delete (UUID id);
+
+    ExpenseResponseDto getById(UUID id);
+
+    List<ExpenseResponseDto> getByBusinessId(UUID businessId);
+
+    ExpenseResponseDto update(UUID id, ExpenseRequestDto dto);
+
+    void delete(UUID id);
 }
